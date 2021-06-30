@@ -23,9 +23,17 @@ The javascript `Date` as string. Type represents date and time as the ISO Date s
 scalar DateTime
 
 type Mutation {
+  changePassword(changePassInput: ChangePasswordInput!): User!
   addUser(input: RegisterInput!): User!
   updateUser(input: UpdateInput!, userId: String!): User!
   deleteUser(userId: String!): User!
+}
+
+input ChangePasswordInput {
+  user_id: String!
+  currentPass: String!
+  newPass: String!
+  confirmPass: String!
 }
 
 input RegisterInput {
@@ -38,6 +46,5 @@ input RegisterInput {
 input UpdateInput {
   user_id: String
   username: String
-  password: String
   email: String
 }
