@@ -24,6 +24,7 @@ scalar DateTime
 
 type Mutation {
   changePassword(changePassInput: ChangePasswordInput!): User!
+  login(input: LoginInput!): AuthResponse!
   addUser(input: RegisterInput!): User!
   updateUser(input: UpdateInput!, userId: String!): User!
   deleteUser(userId: String!): User!
@@ -34,6 +35,16 @@ input ChangePasswordInput {
   currentPass: String!
   newPass: String!
   confirmPass: String!
+}
+
+type AuthResponse {
+  token: String!
+  user: User!
+}
+
+input LoginInput {
+  user_id: String!
+  password: String!
 }
 
 input RegisterInput {
