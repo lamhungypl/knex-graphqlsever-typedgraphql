@@ -1,7 +1,7 @@
 import { Knex } from 'knex';
 import { Query, Resolver, Ctx, Arg, Mutation } from 'type-graphql';
 import { RegisterInput } from '../dto/RegisterInput';
-import { User } from '../src/entities/User';
+import { User } from '../entities/User';
 
 @Resolver()
 export class UserResolver {

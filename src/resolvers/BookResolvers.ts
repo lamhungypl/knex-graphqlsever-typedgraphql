@@ -1,6 +1,6 @@
 import { Query, Resolver } from 'type-graphql';
-import { books } from '../data/data';
-import { Book } from '../schema/models';
+import { books } from '../../data/data';
+import { Book } from '../entities/Book';
 @Resolver()
 export class BookResolver {
   // constructor(private bookService: BookService) {}
