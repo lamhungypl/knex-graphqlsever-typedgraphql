@@ -1,6 +1,6 @@
 import { ApolloError } from 'apollo-server';
 import { Knex } from 'knex';
-import { Query, Resolver, Ctx, Arg, Mutation, Field, ObjectType } from 'type-graphql';
+import { Query, Resolver, Ctx, Arg, Mutation, Field, ObjectType, Authorized } from 'type-graphql';
 import { RegisterInput } from '../dto/RegisterInput';
 import { UpdateInput } from '../dto/UpdateInput';
 import { User } from '../entities/User';
@@ -8,6 +8,7 @@ import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import { ChangePasswordInput } from '../dto/ChangePassword';
 import { LoginInput } from '../dto/LoginInput';
+import { SECRET } from '../constants/constants';
 
 @ObjectType()
 class AuthResponse {
@@ -30,6 +31,7 @@ export class UserResolver {
   }
 
   @Mutation(() => User)
+  @Authorized()
   async changePassword(@Arg('changePassInput') changePassInput: ChangePasswordInput, @Ctx() ctx) {
     const db: Knex = ctx.db;
     const { user_id, currentPass, newPass, confirmPass } = changePassInput;
@@ -76,7 +78,7 @@ export class UserResolver {
         throw new ApolloError('Username/ password wrong');
       }
 
-      const token = jwt.sign({ id: user.user_id }, 'AAA123', {
+      const token = jwt.sign({ id: user.user_id }, SECRET, {
         expiresIn: 3600,
       });
       return { token, user };

@@ -8,9 +8,11 @@ import { buildSchema } from 'type-graphql';
 import { UserResolver } from './src/resolvers/UserResolver';
 import { db as database } from './db/db';
 import { printSchema } from 'graphql';
+import { authChecker } from './src/middlewares/authMiddleware';
 
 async function main() {
   const schema = await buildSchema({
+    authChecker: authChecker,
     resolvers: [BookResolver, UserResolver],
   });
   const server = new ApolloServer({
