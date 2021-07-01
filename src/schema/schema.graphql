@@ -2,6 +2,8 @@ type Query {
   books: [Book!]!
   book: Book!
   users: [User!]!
+  postWithAuthor(authorId: String!): [Post!]!
+  posts: [Post!]!
 }
 
 type Book {
@@ -22,12 +24,23 @@ The javascript `Date` as string. Type represents date and time as the ISO Date s
 """
 scalar DateTime
 
+type Post {
+  post_id: ID!
+  title: String
+  content: String
+  created_at: DateTime
+  updated_at: DateTime
+  author: User
+}
+
 type Mutation {
   changePassword(changePassInput: ChangePasswordInput!): User!
   login(input: LoginInput!): AuthResponse!
-  addUser(input: RegisterInput!): User!
+  register(input: RegisterInput!): User!
   updateUser(input: UpdateInput!, userId: String!): User!
-  deleteUser(userId: String!): User!
+  deleteUser(postId: String!): Post!
+  addPost(input: AddPostInput!): Post!
+  updatePost(input: UpdatePostInput!, postId: String!): Post!
 }
 
 input ChangePasswordInput {
@@ -58,4 +71,20 @@ input UpdateInput {
   user_id: String
   username: String
   email: String
+}
+
+input AddPostInput {
+  post_id: ID!
+  title: String
+  content: String
+  created_at: DateTime
+  updated_at: DateTime
+}
+
+input UpdatePostInput {
+  title: String
+  content: String
+  created_at: DateTime
+  updated_at: DateTime
+  author_id: ID
 }

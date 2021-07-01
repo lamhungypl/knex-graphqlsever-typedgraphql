@@ -88,7 +88,7 @@ export class UserResolver {
   }
 
   @Mutation(() => User)
-  async addUser(@Arg('input') input: RegisterInput, @Ctx() ctx) {
+  async register(@Arg('input') input: RegisterInput, @Ctx() ctx) {
     const db: Knex = ctx.db;
     const { password, ...rest } = input;
     const hashPassword = await bcrypt.hash(password, 10);
