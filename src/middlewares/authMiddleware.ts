@@ -1,4 +1,4 @@
-import { ApolloError } from 'apollo-server';
+import { ApolloError } from 'apollo-server-express';
 import { verify } from 'jsonwebtoken';
 import { AuthChecker } from 'type-graphql';
 import { MyContext } from '../@types/types';

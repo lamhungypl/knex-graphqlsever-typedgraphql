@@ -1,4 +1,4 @@
-import { ApolloError } from 'apollo-server';
+import { ApolloError } from 'apollo-server-express';
 import { Knex } from 'knex';
 import { Query, Resolver, Ctx, Arg, Mutation, Field, ObjectType, Authorized } from 'type-graphql';
 import { RegisterInput } from '../dto/RegisterInput';
