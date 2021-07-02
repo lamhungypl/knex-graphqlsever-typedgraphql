@@ -38,7 +38,7 @@ type Mutation {
   register(input: RegisterInput!): User!
   updateUser(input: UpdateInput!, userId: String!): User!
   deleteUser(postId: String!): Post!
-  addPost(input: AddPostInput!): Post!
+  addPost(payload: AddPostInput!): Post!
   updatePost(input: UpdatePostInput!, postId: String!): Post!
 }
 

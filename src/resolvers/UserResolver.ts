@@ -65,9 +65,9 @@ export class UserResolver {
   }
 
   @Mutation(() => AuthResponse)
-  async login(@Arg('input') input: LoginInput, @Ctx() ctx) {
+  async login(@Arg('payload') payload: LoginInput, @Ctx() ctx) {
     const db: Knex = ctx.db;
-    const { user_id, password } = input;
+    const { user_id, password } = payload;
     try {
       const [user] = await db('users').where({ user_id });
       if (!user) {
@@ -88,26 +88,34 @@ export class UserResolver {
   }
 
   @Mutation(() => User)
-  async register(@Arg('input') input: RegisterInput, @Ctx() ctx) {
+  async register(@Arg('payload') payload: RegisterInput, @Ctx() ctx) {
     const db: Knex = ctx.db;
-    const { password, ...rest } = input;
+    const { password, ...rest } = payload;
     const hashPassword = await bcrypt.hash(password, 10);
+    const timestamp = Date.now();
+    s;
     const [user] = await db('users')
-      .insert({ ...input, password: hashPassword })
+      .insert({ ...payload, password: hashPassword, created_at: timestamp, updated_at: timestamp })
       .returning('*');
     console.log({ user });
     return user;
   }
   @Mutation(() => User)
-  async updateUser(@Arg('userId') userId: string, @Arg('input') input: UpdateInput, @Ctx() ctx) {
+  async updateUser(@Arg('userId') userId: string, @Arg('payload') payload: UpdateInput, @Ctx() ctx) {
     const db: Knex = ctx.db;
-    const { user_id, ...userInfo } = input;
+    const { user_id, ...userInfo } = payload;
     try {
       const [matchUser] = await db('users').where({ user_id: userId });
       if (!matchUser) {
         throw new ApolloError('User not found');
       }
-      const [user] = await db('users').where({ user_id: userId }).update(userInfo).returning('*');
+
+      const timestamp = Date.now();
+
+      const [user] = await db('users')
+        .where({ user_id: userId })
+        .update({ ...userInfo, updated_at: timestamp })
+        .returning('*');
       console.log(user);
       return user;
     } catch (error) {

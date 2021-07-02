@@ -45,12 +45,12 @@ export class PostResolver {
   }
 
   @Mutation(() => Post)
-  async addPost(@Arg('input') input: AddPostInput, @Ctx() ctx: MyContext) {
+  async addPost(@Arg('payload') payload: AddPostInput, @Ctx() ctx: MyContext) {
     const { db, userId } = ctx;
-    const { ...postData } = input;
-
+    const { ...postData } = payload;
+    const timestamp = Date.now();
     const [post] = await db('posts')
-      .insert({ ...postData, author_id: userId })
+      .insert({ ...postData, author_id: userId, created_at: timestamp, updated_at: timestamp })
       .returning('*');
 
     return post;
@@ -64,7 +64,12 @@ export class PostResolver {
       if (!matchPost) {
         throw new ApolloError('Post not found');
       }
-      const [post] = await db('posts').where({ post_id: postId }).update(postData).returning('*');
+      const timestamp = Date.now();
+
+      const [post] = await db('posts')
+        .where({ post_id: postId })
+        .update({ ...postData, updated_at: timestamp })
+        .returning('*');
       console.log(post);
       return post;
     } catch (error) {
