@@ -2,7 +2,7 @@ type Query {
   books: [Book!]!
   book: Book!
   users: [User!]!
-  posts: [Post!]!
+  posts(orderBy: PostOrder): [Post!]!
 }
 
 type Book {
@@ -26,6 +26,10 @@ type Post {
   created_at: String
   updated_at: String
   author: User
+}
+
+input PostOrder {
+  updated_at: String!
 }
 
 type Mutation {

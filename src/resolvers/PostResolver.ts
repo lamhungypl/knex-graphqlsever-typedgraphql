@@ -1,8 +1,9 @@
 import { ApolloError } from 'apollo-server-express';
 import { Knex } from 'knex';
-import { Query, Resolver, Ctx, Arg, Mutation, Field, ObjectType, Authorized, FieldResolver, Root } from 'type-graphql';
+import { Query, Resolver, Ctx, Arg, Mutation, FieldResolver, Root, Args } from 'type-graphql';
 import { MyContext } from '../@types/types';
 import { AddPostInput } from '../dto/AddPostInput';
+import { PostArgs } from '../dto/PostArgs';
 
 import { UpdatePostInput } from '../dto/UpdatePostInput';
 import { Post } from '../entities/Post';
@@ -37,9 +38,10 @@ export class PostResolver {
   // }
 
   @Query(() => [Post])
-  async posts(@Ctx() ctx) {
+  async posts(@Ctx() ctx, @Args(() => PostArgs) { orderBy }: PostArgs) {
     const db: Knex = ctx.db;
-    const posts = await db.select().table('posts');
+    const { updated_at } = orderBy;
+    const posts = await db.table('posts').orderBy('updated_at', updated_at).select();
     return posts;
   }
 
