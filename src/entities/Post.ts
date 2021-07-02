@@ -13,10 +13,10 @@ export class Post {
   content: string;
 
   @Field({ nullable: true })
-  created_at: Date;
+  created_at: string;
 
   @Field({ nullable: true })
-  updated_at: Date;
+  updated_at: string;
 
   @Field(() => User, { nullable: true })
   author?: User;

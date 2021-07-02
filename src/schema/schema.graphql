@@ -14,32 +14,28 @@ type User {
   user_id: ID!
   username: String
   email: String
-  created_at: DateTime
-  updated_at: DateTime
+  created_at: String
+  updated_at: String
+  posts: [Post!]
 }
-
-"""
-The javascript `Date` as string. Type represents date and time as the ISO Date string.
-"""
-scalar DateTime
 
 type Post {
   post_id: ID!
   title: String
   content: String
-  created_at: DateTime
-  updated_at: DateTime
+  created_at: String
+  updated_at: String
   author: User
 }
 
 type Mutation {
   changePassword(changePassInput: ChangePasswordInput!): User!
-  login(input: LoginInput!): AuthResponse!
-  register(input: RegisterInput!): User!
-  updateUser(input: UpdateInput!, userId: String!): User!
+  login(payload: LoginInput!): AuthResponse!
+  register(payload: RegisterInput!): User!
+  updateUser(payload: UpdateInput!, userId: String!): User!
   deleteUser(postId: String!): Post!
   addPost(payload: AddPostInput!): Post!
-  updatePost(input: UpdatePostInput!, postId: String!): Post!
+  updatePost(payload: UpdatePostInput!, postId: String!): Post!
 }
 
 input ChangePasswordInput {
@@ -79,6 +75,11 @@ input AddPostInput {
   created_at: DateTime
   updated_at: DateTime
 }
+
+"""
+The javascript `Date` as string. Type represents date and time as the ISO Date string.
+"""
+scalar DateTime
 
 input UpdatePostInput {
   title: String

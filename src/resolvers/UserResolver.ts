@@ -1,6 +1,6 @@
 import { ApolloError } from 'apollo-server-express';
 import { Knex } from 'knex';
-import { Query, Resolver, Ctx, Arg, Mutation, Field, ObjectType, Authorized } from 'type-graphql';
+import { Query, Resolver, Ctx, Arg, Mutation, Field, ObjectType, Authorized, FieldResolver, Root } from 'type-graphql';
 import { RegisterInput } from '../dto/RegisterInput';
 import { UpdateInput } from '../dto/UpdateInput';
 import { User } from '../entities/User';
@@ -9,6 +9,8 @@ import * as jwt from 'jsonwebtoken';
 import { ChangePasswordInput } from '../dto/ChangePassword';
 import { LoginInput } from '../dto/LoginInput';
 import { SECRET } from '../constants/constants';
+import { Post } from '../entities/Post';
+import { MyContext } from '../@types/types';
 
 @ObjectType()
 class AuthResponse {
@@ -19,14 +21,25 @@ class AuthResponse {
   user: User;
 }
 
-@Resolver()
+@Resolver(() => User)
 export class UserResolver {
   // constructor(private bookService: B∂ookService) {}
+
+  @FieldResolver(() => [Post])
+  async posts(@Root() user: User, @Ctx() ctx: MyContext) {
+    const {
+      dataLoader: { postLoader },
+    } = ctx;
+    const posts = await postLoader.load(user.user_id);
+
+    return posts;
+  }
+
   @Query(() => [User])
   async users(@Ctx() ctx) {
     const db: Knex = ctx.db;
     const users = await db.select().table('users');
-    console.log({ users });
+
     return users;
   }
 
@@ -93,7 +106,7 @@ export class UserResolver {
     const { password, ...rest } = payload;
     const hashPassword = await bcrypt.hash(password, 10);
     const timestamp = Date.now();
-    s;
+
     const [user] = await db('users')
       .insert({ ...payload, password: hashPassword, created_at: timestamp, updated_at: timestamp })
       .returning('*');

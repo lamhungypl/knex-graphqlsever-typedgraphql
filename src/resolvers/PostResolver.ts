@@ -14,7 +14,6 @@ export class PostResolver {
   @FieldResolver(() => User)
   async author(@Root() post: Post, @Ctx() ctx: MyContext) {
     const {
-      db,
       dataLoader: { userDataLoader },
     } = ctx;
     const user = await userDataLoader.load(post.author_id);
@@ -56,9 +55,9 @@ export class PostResolver {
     return post;
   }
   @Mutation(() => Post)
-  async updatePost(@Arg('postId') postId: string, @Arg('input') input: UpdatePostInput, @Ctx() ctx) {
+  async updatePost(@Arg('postId') postId: string, @Arg('payload') payload: UpdatePostInput, @Ctx() ctx) {
     const db: Knex = ctx.db;
-    const { ...postData } = input;
+    const { ...postData } = payload;
     try {
       const [matchPost] = await db('posts').where({ post_id: postId });
       if (!matchPost) {
