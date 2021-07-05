@@ -12,12 +12,13 @@ import { UserResolver } from './src/resolvers/UserResolver';
 import { db as database } from './db/db';
 import { printSchema } from 'graphql';
 import { authChecker } from './src/middlewares/authMiddleware';
+import { PostResolver } from './src/resolvers/PostResolver';
 
 async function main() {
   const app = express();
   const schema = await buildSchema({
     authChecker: authChecker,
-    resolvers: [BookResolver, UserResolver],
+    resolvers: [BookResolver, UserResolver, PostResolver],
   });
   const server = new ApolloServer({
     schema: schema,

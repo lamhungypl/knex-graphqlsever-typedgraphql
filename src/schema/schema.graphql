@@ -2,6 +2,7 @@ type Query {
   books: [Book!]!
   book: Book!
   users: [User!]!
+  posts(orderBy: PostOrder): [Post!]!
 }
 
 type Book {
@@ -15,6 +16,10 @@ type User {
   email: String
   created_at: String
   updated_at: String
+}
+
+input PostOrder {
+  updated_at: String!
 }
 
 type Mutation {
@@ -49,8 +54,18 @@ input RegisterInput {
   email: String
 }
 
-input UpdateInput {
-  user_id: String
-  username: String
-  email: String
+input AddPostInput {
+  post_id: ID!
+  title: String
+  content: String
+  created_at: DateTime
+  updated_at: DateTime
+}
+
+input UpdatePostInput {
+  title: String
+  content: String
+  created_at: DateTime
+  updated_at: DateTime
+  author_id: ID
 }
