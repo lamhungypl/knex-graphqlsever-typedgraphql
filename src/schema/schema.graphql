@@ -25,6 +25,8 @@ scalar DateTime
 type Mutation {
   login(payload: LoginInput!): AuthResponse!
   addUser(input: RegisterInput!): User!
+  updateUser(payload: UpdateInput!, userId: String!): User!
+  deleteUser(userId: String!): User!
 }
 
 type AuthResponse {
@@ -41,5 +43,11 @@ input RegisterInput {
   user_id: String
   username: String
   password: String
+  email: String
+}
+
+input UpdateInput {
+  user_id: String
+  username: String
   email: String
 }
