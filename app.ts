@@ -1,11 +1,13 @@
 import 'reflect-metadata';
+import * as fs from 'fs';
 import { ApolloServer, gql } from 'apollo-server';
 // import { buildSchema } from 'graphql';
-import { BookResolver } from './resolvers/BookResolvers';
+import { BookResolver } from './src/resolvers/BookResolvers';
 import { buildSchema } from 'type-graphql';
 
-import { UserResolver } from './resolvers/UserResolver';
+import { UserResolver } from './src/resolvers/UserResolver';
 import { db as database } from './db/db';
+import { printSchema } from 'graphql';
 
 async function main() {
   const schema = await buildSchema({
@@ -22,6 +24,9 @@ async function main() {
     },
   });
   server.listen().then(({ url }) => {
+    const schemaFile = printSchema(schema);
+    fs.writeFileSync(__dirname + '/src/schema/schema.graphql', schemaFile);
+
     console.log(`server listening at ${url}`);
   });
 }

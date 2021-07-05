@@ -1,0 +1,34 @@
+type Query {
+  books: [Book!]!
+  book: Book!
+  users: [User!]!
+}
+
+type Book {
+  title: String!
+  author: String!
+}
+
+type User {
+  user_id: ID!
+  username: String
+  email: String
+  created_at: DateTime
+  updated_at: DateTime
+}
+
+"""
+The javascript `Date` as string. Type represents date and time as the ISO Date string.
+"""
+scalar DateTime
+
+type Mutation {
+  addUser(input: RegisterInput!): User!
+}
+
+input RegisterInput {
+  user_id: String
+  username: String
+  password: String
+  email: String
+}
