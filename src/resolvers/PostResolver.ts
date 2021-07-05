@@ -1,6 +1,6 @@
 import { ApolloError } from 'apollo-server-express';
 import { Knex } from 'knex';
-import { Query, Resolver, Ctx, Arg, Mutation, FieldResolver, Root, Args } from 'type-graphql';
+import { Query, Resolver, Ctx, Arg, Mutation, FieldResolver, Root, Args, Authorized } from 'type-graphql';
 import { MyContext } from '../@types/types';
 import { AddPostInput } from '../dto/AddPostInput';
 import { PostArgs } from '../dto/PostArgs';
@@ -46,6 +46,7 @@ export class PostResolver {
   }
 
   @Mutation(() => Post)
+  @Authorized()
   async addPost(@Arg('payload') payload: AddPostInput, @Ctx() ctx: MyContext) {
     const { db, userId } = ctx;
     const { ...postData } = payload;
@@ -57,6 +58,7 @@ export class PostResolver {
     return post;
   }
   @Mutation(() => Post)
+  @Authorized()
   async updatePost(@Arg('postId') postId: string, @Arg('payload') payload: UpdatePostInput, @Ctx() ctx) {
     const db: Knex = ctx.db;
     const { ...postData } = payload;
@@ -78,6 +80,7 @@ export class PostResolver {
     }
   }
   @Mutation(() => Post)
+  @Authorized()
   async deletePost(@Arg('postId') postId: string, @Ctx() ctx) {
     const db: Knex = ctx.db;
     try {

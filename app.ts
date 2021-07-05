@@ -13,6 +13,7 @@ import { db as database } from './db/db';
 import { printSchema } from 'graphql';
 import { authChecker } from './src/middlewares/authMiddleware';
 import { PostResolver } from './src/resolvers/PostResolver';
+import { dataLoader } from './src/dataloaders/dataloader';
 
 async function main() {
   const app = express();
@@ -27,6 +28,7 @@ async function main() {
         req,
         res,
         db: database,
+        dataLoader: dataLoader,
       };
     },
   });
