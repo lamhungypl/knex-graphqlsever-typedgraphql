@@ -30,9 +30,9 @@ export class UserResolver {
   @Mutation(() => AuthResponse)
   async login(@Arg('payload') payload: LoginInput, @Ctx() ctx) {
     const db: Knex = ctx.db;
-    const { user_id, password } = payload;
+    const { username, password } = payload;
     try {
-      const [user] = await db('users').where({ user_id });
+      const [user] = await db('users').where({ username });
       if (!user) {
         throw new ApolloError('User not found');
       }
@@ -49,7 +49,24 @@ export class UserResolver {
       throw new ApolloError(error.message);
     }
   }
+  @Mutation(() => User)
+  async register(@Arg('payload') payload: RegisterInput, @Ctx() ctx) {
+    const db: Knex = ctx.db;
+    const { password, username, ...rest } = payload;
+    const [user] = await db('users').where({ username });
+    if (user) {
+      throw new ApolloError('This User is already taken');
+    }
 
+    const hashPassword = await bcrypt.hash(password, 10);
+    const timestamp = Date.now();
+
+    const [newUser] = await db('users')
+      .insert({ username, ...rest, password: hashPassword, created_at: timestamp, updated_at: timestamp })
+      .returning('*');
+    console.log({ newUser });
+    return newUser;
+  }
   @Mutation(() => User)
   async addUser(@Arg('input') input: RegisterInput, @Ctx() ctx) {
     const db: Knex = ctx.db;
