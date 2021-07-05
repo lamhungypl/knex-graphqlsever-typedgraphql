@@ -1,14 +1,14 @@
 import { ApolloError } from 'apollo-server-express';
 
 import { Knex } from 'knex';
-import { Query, Resolver, Ctx, Arg, Mutation, ObjectType, Field } from 'type-graphql';
+import { Query, Resolver, Ctx, Arg, Mutation, ObjectType, Field, Authorized } from 'type-graphql';
 import { LoginInput } from '../dto/LoginInput';
 import { RegisterInput } from '../dto/RegisterInput';
 import { User } from '../entities/User';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import { SECRET } from '../constants/constants';
-
+import { ChangePasswordInput } from '../dto/ChangePassword';
 import { UpdateInput } from '../dto/UpdateInput';
 @ObjectType()
 class AuthResponse {
@@ -28,6 +28,40 @@ export class UserResolver {
     const users = await db.select().table('users');
     console.log({ users });
     return users;
+  }
+
+  @Mutation(() => User)
+  @Authorized()
+  async changePassword(@Arg('changePassInput') changePassInput: ChangePasswordInput, @Ctx() ctx) {
+    const db: Knex = ctx.db;
+    const { user_id, currentPass, newPass, confirmPass } = changePassInput;
+    try {
+      if (newPass !== confirmPass) {
+        throw new ApolloError('Password and confirm does not match');
+      }
+
+      const [matchUser] = await db('users').where({ user_id: user_id });
+      if (!matchUser) {
+        throw new ApolloError('User not found');
+      }
+      const matchedPass = await bcrypt.compare(currentPass, matchUser.password);
+
+      if (!matchedPass) {
+        throw new ApolloError('Username/ password wrong');
+      }
+      const hashPass = await bcrypt.hash(newPass, 10);
+
+      const [user] = await db('users')
+        .where({ user_id: user_id })
+        .update({
+          password: hashPass,
+        })
+        .returning('*');
+      console.log('changed pass', { ...user, password: hashPass });
+      return user;
+    } catch (error) {
+      throw new ApolloError(error.message);
+    }
   }
 
   @Mutation(() => AuthResponse)
