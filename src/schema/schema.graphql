@@ -18,9 +18,19 @@ type User {
 }
 
 type Mutation {
+  changePassword(changePassInput: ChangePasswordInput!): User!
   login(payload: LoginInput!): AuthResponse!
   register(payload: RegisterInput!): User!
   addUser(input: RegisterInput!): User!
+  updateUser(payload: UpdateInput!, userId: String!): User!
+  deleteUser(userId: String!): User!
+}
+
+input ChangePasswordInput {
+  user_id: String!
+  currentPass: String!
+  newPass: String!
+  confirmPass: String!
 }
 
 type AuthResponse {
@@ -36,5 +46,11 @@ input LoginInput {
 input RegisterInput {
   username: String
   password: String
+  email: String
+}
+
+input UpdateInput {
+  user_id: String
+  username: String
   email: String
 }
