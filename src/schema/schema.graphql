@@ -24,6 +24,7 @@ scalar DateTime
 
 type Mutation {
   login(payload: LoginInput!): AuthResponse!
+  register(payload: RegisterInput!): User!
   addUser(input: RegisterInput!): User!
 }
 

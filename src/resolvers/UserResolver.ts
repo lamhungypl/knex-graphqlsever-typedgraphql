@@ -49,7 +49,24 @@ export class UserResolver {
       throw new ApolloError(error.message);
     }
   }
+  @Mutation(() => User)
+  async register(@Arg('payload') payload: RegisterInput, @Ctx() ctx) {
+    const db: Knex = ctx.db;
+    const { password, user_id, ...rest } = payload;
+    const [user] = await db('users').where({ user_id });
+    if (user) {
+      throw new ApolloError('This User is already taken');
+    }
 
+    const hashPassword = await bcrypt.hash(password, 10);
+    const timestamp = Date.now();
+
+    const [newUser] = await db('users')
+      .insert({ user_id, ...rest, password: hashPassword, created_at: timestamp, updated_at: timestamp })
+      .returning('*');
+    console.log({ newUser });
+    return user;
+  }
   @Mutation(() => User)
   async addUser(@Arg('input') input: RegisterInput, @Ctx() ctx) {
     const db: Knex = ctx.db;
