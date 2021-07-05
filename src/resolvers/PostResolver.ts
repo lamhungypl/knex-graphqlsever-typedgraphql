@@ -1,15 +1,26 @@
 import { ApolloError } from 'apollo-server-express';
 import { Knex } from 'knex';
-import { Query, Resolver, Ctx, Arg, Mutation, Args } from 'type-graphql';
+import { Query, Resolver, Ctx, Arg, Mutation, FieldResolver, Root, Args } from 'type-graphql';
 import { MyContext } from '../@types/types';
 import { AddPostInput } from '../dto/AddPostInput';
+import { PostArgs } from '../dto/PostArgs';
 
 import { UpdatePostInput } from '../dto/UpdatePostInput';
 import { Post } from '../entities/Post';
+import { User } from '../entities/User';
 
 @Resolver(() => Post)
 export class PostResolver {
   // constructor(private bookService: B∂ookService) {}
+  @FieldResolver(() => User)
+  async author(@Root() post: Post, @Ctx() ctx: MyContext) {
+    const {
+      dataLoader: { userDataLoader },
+    } = ctx;
+    const user = await userDataLoader.load(post.author_id);
+
+    return user;
+  }
 
   // @Query(() => [Post])
   // async postWithAuthor(@Arg('authorId') authorId: string, @Ctx() ctx) {
@@ -27,10 +38,10 @@ export class PostResolver {
   // }
 
   @Query(() => [Post])
-  async posts(@Ctx() ctx) {
+  async posts(@Ctx() ctx, @Args(() => PostArgs) { orderBy }: PostArgs) {
     const db: Knex = ctx.db;
-
-    const posts = await db.table('posts').select();
+    const { updated_at } = orderBy;
+    const posts = await db.table('posts').orderBy('updated_at', updated_at).select();
     return posts;
   }
 
@@ -76,7 +87,6 @@ export class PostResolver {
       }
       const [post] = await db('posts').where({ post_id: postId }).delete().returning('*');
       console.log('deleted', post);
-      s;
       return post;
     } catch (error) {
       throw new ApolloError(error.message);
