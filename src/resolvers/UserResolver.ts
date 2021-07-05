@@ -8,6 +8,8 @@ import { User } from '../entities/User';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import { SECRET } from '../constants/constants';
+
+import { UpdateInput } from '../dto/UpdateInput';
 @ObjectType()
 class AuthResponse {
   @Field()
@@ -27,6 +29,7 @@ export class UserResolver {
     console.log({ users });
     return users;
   }
+
   @Mutation(() => AuthResponse)
   async login(@Arg('payload') payload: LoginInput, @Ctx() ctx) {
     const db: Knex = ctx.db;
@@ -73,5 +76,42 @@ export class UserResolver {
     const [user] = await db('users').insert(input).returning('*');
     console.log(user);
     return user;
+  }
+  @Mutation(() => User)
+  async updateUser(@Arg('userId') userId: string, @Arg('payload') payload: UpdateInput, @Ctx() ctx) {
+    const db: Knex = ctx.db;
+    const { user_id, ...userInfo } = payload;
+    try {
+      const [matchUser] = await db('users').where({ user_id: userId });
+      if (!matchUser) {
+        throw new ApolloError('User not found');
+      }
+
+      const timestamp = Date.now();
+
+      const [user] = await db('users')
+        .where({ user_id: userId })
+        .update({ ...userInfo, updated_at: timestamp })
+        .returning('*');
+      console.log(user);
+      return user;
+    } catch (error) {
+      throw new ApolloError(error.message);
+    }
+  }
+  @Mutation(() => User)
+  async deleteUser(@Arg('userId') userId: string, @Ctx() ctx) {
+    const db: Knex = ctx.db;
+    try {
+      const [matchUser] = await db('users').where({ user_id: userId });
+      if (!matchUser) {
+        throw new ApolloError('User not found');
+      }
+      const [user] = await db('users').where({ user_id: userId }).delete().returning('*');
+      console.log('deleted', user);
+      return user;
+    } catch (error) {
+      throw new ApolloError(error.message);
+    }
   }
 }
