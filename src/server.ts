@@ -8,13 +8,17 @@ import { db as database } from '../db/db';
 import { authChecker } from './middlewares/authMiddleware';
 import { BookResolver } from './resolvers/BookResolvers';
 import { UserResolver } from './resolvers/UserResolver';
-import { PostResolver } from './resolvers/PostResolver';
+// import { PostResolver } from './resolvers/PostResolver';
 import { dataLoader } from './dataloaders/dataloader';
 
 export const createApolloServer = async () => {
   const schema = await buildSchema({
     authChecker: authChecker,
-    resolvers: [BookResolver, UserResolver, PostResolver],
+    resolvers: [
+      BookResolver,
+      UserResolver,
+      // PostResolver
+    ],
   });
   const server = new ApolloServer({
     schema: schema,

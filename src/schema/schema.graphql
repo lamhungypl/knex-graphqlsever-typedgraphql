@@ -1,7 +1,7 @@
 type Query {
   books: [Book!]!
   book: Book!
-  users: [User!]!
+  users(info: ArgUserInfo!): [User!]!
 }
 
 type Book {
@@ -15,19 +15,34 @@ type User {
   email: String
   created_at: String
   updated_at: String
+  posts: [Post!]!
+}
+
+type Post {
+  post_id: ID!
+  title: String
+  content: String
+  created_at: String
+  updated_at: String
+  author: User
+}
+
+input ArgUserInfo {
+  email: String = ""
+  limit: Int = 20
+  offset: Int = 0
 }
 
 type Mutation {
   changePassword(changePassInput: ChangePasswordInput!): User!
   login(payload: LoginInput!): AuthResponse!
   register(payload: RegisterInput!): User!
-  addUser(input: RegisterInput!): User!
   updateUser(payload: UpdateInput!, userId: String!): User!
   deleteUser(userId: String!): User!
 }
 
 input ChangePasswordInput {
-  user_id: String!
+  username: String!
   currentPass: String!
   newPass: String!
   confirmPass: String!
@@ -50,7 +65,5 @@ input RegisterInput {
 }
 
 input UpdateInput {
-  user_id: String
-  username: String
   email: String
 }
