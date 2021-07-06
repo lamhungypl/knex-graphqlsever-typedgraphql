@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Auth it should register a user 1`] = `
+Object {
+  "data": null,
+  "errors": Array [
+    Object {
+      "extensions": Object {
+        "code": "INTERNAL_SERVER_ERROR",
+      },
+      "locations": Array [
+        Object {
+          "column": 3,
+          "line": 2,
+        },
+      ],
+      "message": "This User is already taken",
+      "path": Array [
+        "register",
+      ],
+    },
+  ],
+}
+`;
