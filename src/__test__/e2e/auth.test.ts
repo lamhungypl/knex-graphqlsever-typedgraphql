@@ -28,6 +28,15 @@ export const Login = gql`
 `;
 
 describe('Auth', () => {
+  beforeAll(async () => {
+    await db.migrate.latest();
+    await db.seed.run();
+  });
+  afterAll(async () => {
+    await db.migrate.rollback();
+    await db.destroy();
+  });
+
   test('it should register a user', async () => {
     const app = await createTestServer();
     const request = supertest(app);
@@ -39,22 +48,20 @@ describe('Auth', () => {
       .send({ query: print(Register), variables: { input: { username: 'fanuusersme', password: 'a123456' } } });
 
     expect(res.statusCode).toEqual(200);
-
-    const [newUser] = await db('users').where('username', 'fanuusersme');
+    console.log({ response: JSON.stringify(res.body) });
+    const { register: newUser } = res.body.data;
 
     expect(newUser).not.toBeUndefined;
     expect(newUser.username).toEqual('fanuusersme');
   });
 
   test('it should not register a user if the email already exists', async () => {
-    await createUser('fanuusersme', 'useremail@test.com');
-
     const app = await createTestServer();
     const request = supertest(app);
 
     const res = await request
       .post('/graphql')
-      .send({ query: print(Register), variables: { input: { username: 'fanuusersme', password: 'a123456' } } });
+      .send({ query: print(Register), variables: { input: { username: 'username1', password: 'a123456' } } });
 
     const {
       body: { errors, data },
@@ -68,28 +75,25 @@ describe('Auth', () => {
   });
 
   test('should log in a user', async () => {
-    await createUser();
-
     const app = await createTestServer();
     const request = supertest(app);
 
     const res = await request
       .post('/graphql')
-      .send({ query: print(Login), variables: { input: { username: 'fanuusersme', password: 'a123456' } } });
+      .send({ query: print(Login), variables: { input: { username: 'username1', password: 'a123456' } } });
 
     const { token, user } = res.body.data.login;
     expect(token).not.toBeNull();
-    expect(user.username).toEqual('fanuusersme');
+    expect(user.username).toEqual('username1');
   });
 
   test('should throw error if the password is wrong', async () => {
-    await createUser();
     const app = await createTestServer();
     const request = supertest(app);
 
     const res = await request
       .post('/graphql')
-      .send({ query: print(Login), variables: { input: { username: 'fanuusersme', password: '' } } });
+      .send({ query: print(Login), variables: { input: { username: 'username1', password: '' } } });
 
     expect(res.body.data).toBeNull();
     expect(res.body.errors).not.toBeNull();

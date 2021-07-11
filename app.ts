@@ -18,7 +18,7 @@ async function main() {
     const schemaFile = printSchema(schema);
     fs.writeFileSync(__dirname + '/src/schema/schema.graphql', schemaFile);
 
-    console.log(`server listening at ${4000}`);
+    console.log(`server listening at ${4000} ${process.env.NODE_ENV}`);
   });
 }
 main();

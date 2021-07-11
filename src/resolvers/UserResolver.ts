@@ -113,12 +113,12 @@ export class UserResolver {
     }
 
     const hashPassword = await bcrypt.hash(password, 10);
-    const timestamp = Date.now();
+    // const timestamp = Date.now();
 
     const [newUser] = await db('users')
-      .insert({ username, ...rest, password: hashPassword, created_at: timestamp, updated_at: timestamp })
+      .insert({ username, ...rest, password: hashPassword })
       .returning('*');
-    console.log({ newUser });
+
     return newUser;
   }
 
@@ -145,11 +145,11 @@ export class UserResolver {
       if (matchUser.user_id != userIdCtx) {
         throw new ForbiddenError('Permission required');
       }
-      const timestamp = Date.now();
+      // const timestamp = Date.now();
 
       const [user] = await db('users')
         .where({ user_id: userId })
-        .update({ ...userInfo, updated_at: timestamp })
+        .update({ ...userInfo })
         .returning('*');
 
       return user;

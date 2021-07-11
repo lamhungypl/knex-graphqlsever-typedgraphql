@@ -5,7 +5,8 @@
   "main": "app.ts",
   "scripts": {
     "test": "NODE_ENV=test jest --detectOpenHandles  --watchAll=false --force-exit",
-    "start:serve": "nodemon --watch './**/*.ts' --exec 'ts-node' app.ts"
+    "start:serve": "nodemon --watch './**/*.ts' --exec 'ts-node' app.ts",
+    "migrate:test": "NODE_ENV=test npx knex migrate:latest"
   },
   "keywords": [],
   "author": "",
