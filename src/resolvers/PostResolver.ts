@@ -73,7 +73,7 @@ export class PostResolver {
         .where({ post_id: postId })
         .update({ ...postData, updated_at: timestamp })
         .returning('*');
-      console.log(post);
+
       return post;
     } catch (error) {
       throw new ApolloError(error.message);
@@ -89,7 +89,7 @@ export class PostResolver {
         throw new ApolloError('Post not found');
       }
       const [post] = await db('posts').where({ post_id: postId }).delete().returning('*');
-      console.log('deleted', post);
+
       return post;
     } catch (error) {
       throw new ApolloError(error.message);
