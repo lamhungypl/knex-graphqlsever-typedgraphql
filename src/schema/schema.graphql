@@ -2,7 +2,20 @@ type Query {
   books: [Book!]!
   book: Book!
   users(info: ArgUserInfo!): [User!]!
-  posts(orderBy: PostOrder): [Post!]!
+  posts(
+    """Paginate before opaque cursor"""
+    before: String
+
+    """Paginate after opaque cursor"""
+    after: String
+
+    """Paginate first"""
+    first: Float
+
+    """Paginate last"""
+    last: Float
+    orderBy: PostOrder
+  ): PostConnection!
 }
 
 type Book {
@@ -32,6 +45,25 @@ input ArgUserInfo {
   email: String = ""
   limit: Int = 20
   offset: Int = 0
+}
+
+type PostConnection {
+  pageInfo: PageInfo!
+  edges: [PostEdge!]!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+type PostEdge {
+  node: Post
+
+  """Used in `before` and `after` args"""
+  cursor: String
 }
 
 input PostOrder {
@@ -80,19 +112,10 @@ input AddPostInput {
   post_id: ID!
   title: String
   content: String
-  created_at: DateTime
-  updated_at: DateTime
 }
-
-"""
-The javascript `Date` as string. Type represents date and time as the ISO Date string.
-"""
-scalar DateTime
 
 input UpdatePostInput {
   title: String
   content: String
-  created_at: DateTime
-  updated_at: DateTime
   author_id: ID
 }

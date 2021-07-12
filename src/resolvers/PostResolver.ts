@@ -1,3 +1,4 @@
+import * as Relay from 'graphql-relay';
 import { ApolloError } from 'apollo-server-express';
 import { Knex } from 'knex';
 import { Query, Resolver, Ctx, Arg, Mutation, FieldResolver, Root, Args, Authorized } from 'type-graphql';
@@ -6,8 +7,9 @@ import { AddPostInput } from '../dto/AddPostInput';
 import { PostArgs } from '../dto/PostArgs';
 
 import { UpdatePostInput } from '../dto/UpdatePostInput';
-import { Post } from '../entities/Post';
+import { Post, PostConnection } from '../entities/Post';
 import { User } from '../entities/User';
+import { ConnectionArgs } from '../dto/RelayCursorArgs';
 
 @Resolver(() => Post)
 export class PostResolver {
@@ -37,12 +39,30 @@ export class PostResolver {
   //   });
   // }
 
-  @Query(() => [Post])
-  async posts(@Ctx() ctx, @Args(() => PostArgs) { orderBy }: PostArgs) {
+  @Query(() => PostConnection)
+  async posts(
+    @Ctx() ctx,
+    @Args(() => PostArgs) { orderBy }: PostArgs,
+    @Args() { first, after }: ConnectionArgs
+  ): Promise<PostConnection> {
     const db: Knex = ctx.db;
     const { updated_at } = orderBy;
-    const posts = await db.table('posts').orderBy('updated_at', updated_at).select();
-    return posts;
+    console.log({ after: `\'${after}%\'` });
+    const posts = await db
+      .table('posts')
+      .where('post_id', '>', after)
+      .orderBy('updated_at', updated_at)
+      .limit(first)
+      .select();
+    return {
+      edges: posts,
+      pageInfo: {
+        startCursor: after,
+        endCursor: null,
+        hasNextPage: true,
+        hasPreviousPage: true,
+      },
+    };
   }
 
   @Mutation(() => Post)
