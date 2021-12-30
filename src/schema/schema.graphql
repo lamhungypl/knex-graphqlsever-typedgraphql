@@ -1,8 +1,29 @@
 type Query {
   books: [Book!]!
   book: Book!
-  users: [User!]!
-  posts(orderBy: PostOrder): [Post!]!
+  users(info: ArgUserInfo!): [User!]!
+  posts(
+    """
+    Paginate before opaque cursor
+    """
+    before: String
+
+    """
+    Paginate after opaque cursor
+    """
+    after: String
+
+    """
+    Paginate first
+    """
+    first: Float
+
+    """
+    Paginate last
+    """
+    last: Float
+    orderBy: PostOrder
+  ): PostConnection!
 }
 
 type Book {
@@ -16,7 +37,7 @@ type User {
   email: String
   created_at: String
   updated_at: String
-  posts: [Post!]
+  posts: [Post!]!
 }
 
 type Post {
@@ -28,6 +49,33 @@ type Post {
   author: User
 }
 
+input ArgUserInfo {
+  email: String = ""
+  limit: Int = 20
+  offset: Int = 0
+}
+
+type PostConnection {
+  pageInfo: PageInfo!
+  edges: [PostEdge!]!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+type PostEdge {
+  node: Post
+
+  """
+  Used in `before` and `after` args
+  """
+  cursor: String
+}
+
 input PostOrder {
   updated_at: String!
 }
@@ -37,73 +85,14 @@ type Mutation {
   login(payload: LoginInput!): AuthResponse!
   register(payload: RegisterInput!): User!
   updateUser(payload: UpdateInput!, userId: String!): User!
-  deleteUser(postId: String!): Post!
+  deleteUser(userId: String!): User!
   addPost(payload: AddPostInput!): Post!
   updatePost(payload: UpdatePostInput!, postId: String!): Post!
+  deletePost(postId: String!): Post!
 }
 
 input ChangePasswordInput {
-  user_id: String!
-  currentPass: String!
-  newPass: String!
-  confirmPass: String!
-}
-
-type AuthResponse {
-  token: String!
-  user: User!
-}
-
-input LoginInput {
-  user_id: String!
-  password: String!
-}
-
-input RegisterInput {
-  user_id: String
-  username: String
-  password: String
-  email: String
-}
-
-input UpdateInput {
-  user_id: String
-  username: String
-  email: String
-}
-
-input AddPostInput {
-  post_id: ID!
-  title: String
-  content: String
-  created_at: DateTime
-  updated_at: DateTime
-}
-
-"""
-The javascript `Date` as string. Type represents date and time as the ISO Date string.
-"""
-scalar DateTime
-
-input UpdatePostInput {
-  title: String
-  content: String
-  created_at: DateTime
-  updated_at: DateTime
-  author_id: ID
-}
-
-type Mutation {
-  changePassword(changePassInput: ChangePasswordInput!): User!
-  login(payload: LoginInput!): AuthResponse!
-  register(payload: RegisterInput!): User!
-  addUser(input: RegisterInput!): User!
-  updateUser(payload: UpdateInput!, userId: String!): User!
-  deleteUser(userId: String!): User!
-}
-
-input ChangePasswordInput {
-  user_id: String!
+  username: String!
   currentPass: String!
   newPass: String!
   confirmPass: String!
@@ -126,7 +115,17 @@ input RegisterInput {
 }
 
 input UpdateInput {
-  user_id: String
-  username: String
   email: String
+}
+
+input AddPostInput {
+  post_id: ID!
+  title: String
+  content: String
+}
+
+input UpdatePostInput {
+  title: String
+  content: String
+  author_id: ID
 }

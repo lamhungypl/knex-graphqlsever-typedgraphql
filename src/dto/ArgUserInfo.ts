@@ -1,6 +1,6 @@
 import { ArgsType, Field, InputType, Int } from 'type-graphql';
 
-@ArgsType()
+@InputType()
 export class ArgUserInfo {
   @Field({ nullable: true })
   email: string = '';

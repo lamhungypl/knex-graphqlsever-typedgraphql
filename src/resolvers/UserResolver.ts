@@ -46,7 +46,7 @@ export class UserResolver {
     const db: Knex = ctx.db;
     const { limit, offset, email } = info;
     const users = await db.select().table('users').where('email', 'like', `%${email}%`).limit(limit).offset(offset);
-    console.log({ users });
+
     return users;
   }
 
@@ -77,7 +77,7 @@ export class UserResolver {
           password: hashPass,
         })
         .returning('*');
-      console.log('changed pass', { ...user, password: hashPass });
+
       return user;
     } catch (error) {
       throw new ApolloError(error.message);
@@ -116,12 +116,12 @@ export class UserResolver {
     }
 
     const hashPassword = await bcrypt.hash(password, 10);
-    const timestamp = Date.now();
+    // const timestamp = Date.now();
 
     const [newUser] = await db('users')
-      .insert({ username, ...rest, password: hashPassword, created_at: timestamp, updated_at: timestamp })
+      .insert({ username, ...rest, password: hashPassword })
       .returning('*');
-    console.log({ newUser });
+
     return newUser;
   }
 
@@ -214,13 +214,13 @@ export class UserResolver {
       if (matchUser.user_id != userIdCtx) {
         throw new ForbiddenError('Permission required');
       }
-      const timestamp = Date.now();
+      // const timestamp = Date.now();
 
       const [user] = await db('users')
         .where({ user_id: userId })
-        .update({ ...userInfo, updated_at: timestamp })
+        .update({ ...userInfo })
         .returning('*');
-      console.log(user);
+
       return user;
     } catch (error) {
       throw new ApolloError(error.message);
@@ -239,7 +239,7 @@ export class UserResolver {
         throw new ForbiddenError('Permission required');
       }
       const [user] = await db('users').where({ user_id: userId }).delete().returning('*');
-      console.log('deleted', user);
+
       return user;
     } catch (error) {
       throw new ApolloError(error.message);

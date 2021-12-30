@@ -1,4 +1,5 @@
 import { Field, ID, ObjectType } from 'type-graphql';
+import { ConnectionType, EdgeType } from '../dto/RelayCursorArgs';
 import { User } from './User';
 
 @ObjectType()
@@ -23,3 +24,8 @@ export class Post {
 
   author_id: string;
 }
+
+@ObjectType()
+export class PostEdge extends EdgeType('Post', Post) {}
+@ObjectType()
+export class PostConnection extends ConnectionType<PostEdge>('Post', PostEdge) {}
