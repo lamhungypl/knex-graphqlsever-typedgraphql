@@ -3,16 +3,24 @@ type Query {
   book: Book!
   users(info: ArgUserInfo!): [User!]!
   posts(
-    """Paginate before opaque cursor"""
+    """
+    Paginate before opaque cursor
+    """
     before: String
 
-    """Paginate after opaque cursor"""
+    """
+    Paginate after opaque cursor
+    """
     after: String
 
-    """Paginate first"""
+    """
+    Paginate first
+    """
     first: Float
 
-    """Paginate last"""
+    """
+    Paginate last
+    """
     last: Float
     orderBy: PostOrder
   ): PostConnection!
@@ -62,7 +70,9 @@ type PageInfo {
 type PostEdge {
   node: Post
 
-  """Used in `before` and `after` args"""
+  """
+  Used in `before` and `after` args
+  """
   cursor: String
 }
 

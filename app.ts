@@ -1,37 +1,16 @@
 import 'reflect-metadata';
 import express from 'express';
-import { ApolloServer } from 'apollo-server-express';
 
 import * as fs from 'fs';
 
-// import { buildSchema } from 'graphql';
-import { BookResolver } from './src/resolvers/BookResolvers';
-import { buildSchema } from 'type-graphql';
-
-import { UserResolver } from './src/resolvers/UserResolver';
-import { db as database } from './db/db';
 import { printSchema } from 'graphql';
-import { authChecker } from './src/middlewares/authMiddleware';
-import { PostResolver } from './src/resolvers/PostResolver';
-import { dataLoader } from './src/dataloaders/dataloader';
+
+import createApolloServer from './src/server';
 
 async function main() {
   const app = express();
-  const schema = await buildSchema({
-    authChecker: authChecker,
-    resolvers: [BookResolver, UserResolver, PostResolver],
-  });
-  const server = new ApolloServer({
-    schema: schema,
-    context: (req, res) => {
-      return {
-        req,
-        res,
-        db: database,
-        dataLoader: dataLoader,
-      };
-    },
-  });
+
+  const { server, schema } = await createApolloServer();
 
   server.applyMiddleware({ app });
 
@@ -39,7 +18,7 @@ async function main() {
     const schemaFile = printSchema(schema);
     fs.writeFileSync(__dirname + '/src/schema/schema.graphql', schemaFile);
 
-    console.log(`server listening at ${4000}`);
+    console.log(`server listening at ${4000} ${process.env.NODE_ENV}`);
   });
 }
 main();
